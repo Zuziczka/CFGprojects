@@ -1,0 +1,193 @@
+import random
+
+import requests
+
+my_score = 0
+opponent_score = 0
+
+print('Welcome to Super Clash! Get ready to battle!')
+user_name = input("Enter your user name: ")
+
+
+def player_character():
+    items = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 17, 18, 20, 23, 24, 25, 26, 28, 29, 30, 31, 32, 34, 35, 36,
+             37, 38, 39, 40, 41, 42, 43, 44, 45, 48, 49, 52, 53, 56, 57, 58, 60, 61, 62, 63, 66, 68, 69, 70, 71, 72, 73,
+             75, 76, 78, 79, 80, 81, 82, 83, 84, 87, 88, 92, 93, 95, 96, 97, 98, 99, 100]
+    character_number = random.choice(items)
+
+    url = 'https://www.superheroapi.com/api.php/10165190037573990/{}'.format(character_number)
+    chosen = requests.get(url)
+    character = chosen.json()
+
+    return {
+        'name': character['name'],
+        'full-name': character['biography']['full-name'],
+        'alter-egos': character['biography']['alter-egos'],
+        'intelligence': character['powerstats']['intelligence'],
+        'strength': character['powerstats']['strength'],
+        'speed': character['powerstats']['speed'],
+        'durability': character['powerstats']['durability'],
+        'power': character['powerstats']['power'],
+        'combat': character['powerstats']['combat'],
+    }
+
+
+def random_stat():
+    random_number = random.randint(0, 5)
+    if random_number == 0:
+        stat = 'intelligence'
+    elif random_number == 1:
+        stat = 'strength'
+    elif random_number == 2:
+        stat = 'speed'
+    elif random_number == 3:
+        stat = 'durability'
+    elif random_number == 4:
+        stat = 'power'
+    elif random_number == 5:
+        stat = 'combat'
+    return stat
+
+
+def my_turn():
+    global my_score
+    global opponent_score
+
+    random_character_1 = player_character()
+    random_character_2 = player_character()
+    random_character_3 = player_character()
+
+    print('\nYour Hero or Villain choices are: {}, {}, {} '.format(random_character_1['name'],
+                                                                   random_character_2['name'],
+                                                                   random_character_3['name']))
+    character_choice = input('Which character do you want to use? ')
+
+    if character_choice == random_character_1['name']:
+        my_character = random_character_1
+    elif character_choice == random_character_2['name']:
+        my_character = random_character_2
+    elif character_choice == random_character_3['name']:
+        my_character = random_character_3
+    else:
+        raise ValueError('Unexpected transfer type: %s' % transfer_type)
+
+    print('You have chosen {}, otherwise known as {}.'.format(my_character['name'], my_character['full-name']))
+    print('Your stats are: intelligence: {}, strength: {}, speed: {}, durability: {}, power: {}, combat: {} '
+          .format(my_character['intelligence'],
+                  my_character['strength'],
+                  my_character['speed'],
+                  my_character['durability'],
+                  my_character['power'],
+                  my_character['combat']))
+    stat_choice = input('Which stat do you want to use? (intelligence, strength, speed, durability, power, combat) ')
+
+    opponent_character = player_character()
+    print('The opponent chose {}, otherwise know as {}. Their stat is {}.'
+          .format(opponent_character['name'],
+                  opponent_character['full-name'],
+                  opponent_character[stat_choice]))
+
+    my_stat = my_character[stat_choice]
+    opponent_stat = opponent_character[stat_choice]
+
+    if my_stat != "null":
+        my_stat = int(my_character[stat_choice])
+    else:
+        my_stat = 0
+
+    if opponent_stat != "null":
+        opponent_stat = int(opponent_character[stat_choice])
+    else:
+        opponent_stat = 0
+
+    if my_stat == opponent_stat:
+        print('Draw! \n')
+    elif my_stat < opponent_stat:
+        print('You lose this round! \n')
+        opponent_score = opponent_score + 1
+    elif my_stat > opponent_stat:
+        print('You win this round! \n')
+        my_score = my_score + 1
+
+    print("The result of this round is: You {}, Opponent {} \n".format(my_score, opponent_score))
+
+
+def opponent_turn():
+
+    global my_score
+    global opponent_score
+
+    random_character_1 = player_character()
+    random_character_2 = player_character()
+    random_character_3 = player_character()
+
+    print('Your Hero or Villain choices are: {}, {}, {} '.format(random_character_1['name'], random_character_2['name'],
+                                                                 random_character_3['name']))
+    character_choice = input('Which character do you want to use? ')
+
+    if character_choice == random_character_1['name']:
+        my_character = random_character_1
+    elif character_choice == random_character_2['name']:
+        my_character = random_character_2
+    elif character_choice == random_character_3['name']:
+        my_character = random_character_3
+
+    opponent_character = player_character()
+    print('The opponent chose {}'.format(opponent_character['name']))
+
+    opponent_stat_choice = random_stat()
+    print('The opponent chose {} as their stat choice'.format(opponent_stat_choice))
+    print('Your stat is {}. Your opponent\'s stat is {}'.format(my_character[opponent_stat_choice],
+                                                                opponent_character[opponent_stat_choice]))
+
+    opponent_stat = opponent_character[opponent_stat_choice]
+    my_stat = my_character[opponent_stat_choice]
+
+    if my_stat != "null":
+        my_stat = int(my_character[opponent_stat_choice])
+    else:
+        my_stat = 0
+
+    if opponent_stat != "null":
+        opponent_stat = int(opponent_character[opponent_stat_choice])
+    else:
+        opponent_stat = 0
+
+    if my_stat == opponent_stat:
+        print('Draw! \n')
+    elif my_stat < opponent_stat:
+        print('You lose this round! \n')
+        opponent_score += 1
+    elif my_stat > opponent_stat:
+        print('You win this round! \n')
+        my_score += 1
+
+    print("The result of this round is: You {}, Opponent {} \n".format(my_score, opponent_score))
+
+    return my_score, opponent_score
+
+
+
+
+def end_of_game():
+    if my_score > opponent_score:
+        print('You win the Game!! \n')
+    elif my_score < opponent_score:
+        print('Sorry, you lose the game! :( \n')
+    elif my_score == opponent_score:
+        print('It\'s a draw... \n')
+
+for rounds in range(3):
+    my_turn()
+    opponent_turn()
+
+with open("game.txt", "r") as game:
+    scores = game.read()
+
+high_scores = scores + user_name + ' ' + str(my_score) + '\n'
+
+with open('game.txt', 'w+') as game:
+    game.write(high_scores)
+
+end_of_game()
+print(high_scores)
